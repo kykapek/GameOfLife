@@ -1,17 +1,22 @@
 package ru.kykapek.gameoflife.ui.game
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_game.*
+import kotlinx.android.synthetic.main.grid_square.view.*
 import ru.kykapek.gameoflife.R
+import ru.kykapek.gameoflife.databinding.FragmentGameBinding
 import ru.kykapek.gameoflife.model.Cell
 import ru.kykapek.gameoflife.model.Grid
 
@@ -19,10 +24,10 @@ class GameFragment : Fragment() {
 
     private lateinit var gridRecyclerView: RecyclerView
     private var adapter: RecyclerViewAdapter? = null
-    private var grid = Grid(30, 30)
+    private lateinit var grid :Grid
     private var handler: Handler = Handler(Looper.getMainLooper())
     private lateinit var runnable: Runnable
-
+    val gameViewModel: GameViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,93 +37,71 @@ class GameFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_game, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        grid = gameViewModel.grid
         gridRecyclerView = rvField
-        gridRecyclerView.layoutManager = GridLayoutManager(activity, 30)
+        gridRecyclerView.layoutManager = GridLayoutManager(requireActivity().application, 30)
         updateUI()
+        ivStop.isEnabled = false
+
+        ivNext.setOnClickListener {
+            grid.nextGeneration()
+            adapter?.notifyDataSetChanged()
+        }
 
         ivStart.setOnClickListener {
+            ivStop.isEnabled = true
             runnable = Runnable {
                 grid.nextGeneration()
                 adapter?.notifyDataSetChanged()
-
-                // Schedule the task to repeat after 1 second
                 handler.postDelayed(
                     runnable,
-                    1000 // Delay in milliseconds
+                    500
                 )
             }
-
-            // Schedule the task to repeat after 1 second
             handler.postDelayed(
                 runnable,
-                1000 // Delay in milliseconds
+                500
             )
         }
 
         ivStop.setOnClickListener {
-            handler.removeCallbacks(runnable) //deschedule repeating process
+            handler.removeCallbacks(runnable)
         }
     }
 
-    // Assign class variables
     private fun updateUI() {
         adapter = RecyclerViewAdapter()
         gridRecyclerView.adapter = adapter
+        //grid.cells = gameViewModel.cells
     }
 
-    private fun changeColors(scheme: String?) {
-        // Target each view
-        var arrayIndex: Int
-        var subArrayIndex: Int
-        var holder: SquareHolder
-
-        // Cycle through all views
-        for (i in 0 until 900) {
-
-            // Used this to find out how to iterate over each RecyclerView view: https://stackoverflow.com/questions/32811156/how-to-iterate-over-recyclerview-items
-            holder = gridRecyclerView.findViewHolderForAdapterPosition(i) as SquareHolder // Reference to each view
-
-            arrayIndex = i / 30
-            subArrayIndex = i % 30
-
-            // Switch to designated color scheme based on GUI selection
-
-                    if (grid.cells[arrayIndex][subArrayIndex].status) {
-                        holder.mButton.setBackgroundResource(R.drawable.yellow_foreground)
-                    } else {
-                        holder.mButton.setBackgroundResource(R.drawable.gray_foreground)
-                    }
-
-        }
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     private inner class SquareHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val mButton: Button = itemView.findViewById<View>(R.id.grid_square) as Button
         private var mPosition = 0
 
         fun bindPosition(p: Int) {
+
             mPosition = p
             val arrayIndex: Int = mPosition / 30
             val subArrayIndex = mPosition % 30
 
-            // Assign alive color
             if (grid.cells[arrayIndex][subArrayIndex].status) {
-                mButton.setBackgroundResource(R.drawable.yellow_foreground)
+                itemView.grid_square.setBackgroundColor(Color.YELLOW)
 
-            } else { // Assign dead color
-                mButton.setBackgroundResource(R.drawable.gray_foreground)
+            } else {
+                itemView.grid_square.setBackgroundColor(Color.GRAY)
             }
         }
-
-        // Flip status of cell when clicked
         init {
-            mButton.setOnClickListener {
+            itemView.grid_square.setOnClickListener {
                 val arrayIndex: Int = mPosition / 30
                 val subArrayIndex = mPosition % 30
                 grid.cells[arrayIndex][subArrayIndex].changeStatus()
@@ -127,8 +110,6 @@ class GameFragment : Fragment() {
         }
     }
 
-
-    // RecyclerViewAdapter
     private inner class RecyclerViewAdapter : RecyclerView.Adapter<SquareHolder>() {
         override fun onBindViewHolder(holder: SquareHolder, position: Int) {
             holder.bindPosition(position)
@@ -142,5 +123,10 @@ class GameFragment : Fragment() {
         override fun getItemCount(): Int {
             return 900
         }
+    }
+
+    companion object {
+        const val ROWS = 30
+        const val COLOMNS = 30
     }
 }

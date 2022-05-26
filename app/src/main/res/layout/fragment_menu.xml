@@ -16,12 +16,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/_57156311380s_neon_grid"/>
 
-    <ImageView
+    <ImageButton
         android:id="@+id/ivPlay"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true"
+        android:background="@android:color/transparent"
         android:src="@drawable/ic_play"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
