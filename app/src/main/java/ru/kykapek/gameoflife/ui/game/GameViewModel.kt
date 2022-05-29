@@ -18,11 +18,18 @@ class GameViewModel : ViewModel() {
         return cells
     }
 
-    val grid = Grid(30, 30)
+    var grid = Grid(ROWS, COLUMNS)
+
+    var gameState = PAUSED
 
 
     companion object {
-        const val rows = 30
-        const val columns = 30
+        const val PAUSED = "Paused"
+        const val STARTED = "Started"
+        const val STOPPED = "Stopped"
+        const val NO_STATE = "No_State"
+        const val ROWS = 30
+        const val COLUMNS = 30
+
     }
 }

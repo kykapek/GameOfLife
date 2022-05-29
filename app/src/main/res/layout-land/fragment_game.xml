@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.game.GameFragment">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/_57156311380s_neon_grid"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvField"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/ivNext"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_next"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/ivStart"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_start"
+        app:layout_constraintTop_toBottomOf="@id/ivNext"
+        app:layout_constraintStart_toStartOf="@id/ivNext"
+        app:layout_constraintEnd_toEndOf="@id/ivNext"
+        app:layout_constraintBottom_toTopOf="@id/ivStop"/>
+
+    <ImageView
+        android:id="@+id/ivStop"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_stop"
+        app:layout_constraintTop_toBottomOf="@id/ivStart"
+        app:layout_constraintStart_toStartOf="@id/ivStart"
+        app:layout_constraintEnd_toEndOf="@id/ivStart"
+        app:layout_constraintBottom_toTopOf="@id/ivPause"/>
+
+    <ImageView
+        android:id="@+id/ivPause"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_pause"
+        app:layout_constraintTop_toBottomOf="@id/ivStop"
+        app:layout_constraintStart_toStartOf="@id/ivStop"
+        app:layout_constraintEnd_toEndOf="@id/ivStop"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

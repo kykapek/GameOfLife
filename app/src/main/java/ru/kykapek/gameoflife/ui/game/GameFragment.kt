@@ -28,6 +28,7 @@ class GameFragment : Fragment() {
     private var handler: Handler = Handler(Looper.getMainLooper())
     private lateinit var runnable: Runnable
     val gameViewModel: GameViewModel by viewModels()
+    private lateinit var state: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,34 +44,32 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         grid = gameViewModel.grid
+        state = gameViewModel.gameState
+        //checkState(state)
         gridRecyclerView = rvField
         gridRecyclerView.layoutManager = GridLayoutManager(requireActivity().application, 30)
         updateUI()
         ivStop.isEnabled = false
 
         ivNext.setOnClickListener {
-            grid.nextGeneration()
-            adapter?.notifyDataSetChanged()
+            //if (state == PAUSED) {
+                grid.nextGeneration()
+                adapter?.notifyDataSetChanged()
+            //}
         }
 
         ivStart.setOnClickListener {
-            ivStop.isEnabled = true
-            runnable = Runnable {
-                grid.nextGeneration()
-                adapter?.notifyDataSetChanged()
-                handler.postDelayed(
-                    runnable,
-                    500
-                )
-            }
-            handler.postDelayed(
-                runnable,
-                500
-            )
+            state = STARTED
+            checkState(state)
+        }
+
+        ivPause.setOnClickListener {
+            state = PAUSED
+            checkState(state)
         }
 
         ivStop.setOnClickListener {
-            handler.removeCallbacks(runnable)
+            //handler.removeCallbacks(runnable)
         }
     }
 
@@ -80,8 +79,43 @@ class GameFragment : Fragment() {
         //grid.cells = gameViewModel.cells
     }
 
+    fun checkState(state: String) {
+        when(state) {
+            "Paused" -> pauseGeneration()
+            "Started" -> startGeneration()
+            "Stopped" -> stopGeneration()
+        }
+    }
+
+    private fun pauseGeneration() {
+        gameViewModel.gameState = PAUSED
+        handler.removeCallbacks(runnable)
+    }
+
+    private fun stopGeneration() {
+
+    }
+
+    private fun startGeneration() {
+        gameViewModel.gameState = STARTED
+        ivStop.isEnabled = true
+        runnable = Runnable {
+            grid.nextGeneration()
+            adapter?.notifyDataSetChanged()
+            handler.postDelayed(
+                runnable,
+                500
+            )
+        }
+        handler.postDelayed(
+            runnable,
+            500
+        )
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        //gameViewModel.gameState = state
     }
 
     private inner class SquareHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -126,6 +160,10 @@ class GameFragment : Fragment() {
     }
 
     companion object {
+        const val PAUSED = "Paused"
+        const val STARTED = "Started"
+        const val STOPPED = "Stopped"
+        const val NO_STATE = "No_State"
         const val ROWS = 30
         const val COLOMNS = 30
     }
